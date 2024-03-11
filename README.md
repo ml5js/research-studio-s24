@@ -26,7 +26,7 @@ The academic requirement for this class is a documention of each step of the res
   - Tres - [Generative Audio in ml5.js](projects/tres_proposal.md) - Researching suitable machine learning models for audio generation in the browser
   - Spencer -
 - Speculative Website Enhancements
-  - Alan Ren - [projects/ml5.js Website Functionality Enhancement and Examples with Built-in Editor](projects/alanren.md) - Enhance the ml5.js website and built-in code editor.
+  - Alan Ren - [ml5.js Website Functionality Enhancement and Examples with Built-in Editor](projects/alanren.md) - Enhance the ml5.js website and built-in code editor.
   - Xiaozao Wang - [Interactive Machine Learning for Beginners](projects/Xiaozao_Wang.md) - Help beginners understand how machine learning works behind the scene through interactive web materials.
 - Documentation and Accessibility
   - Myrah Sarwar - [Increasing Accessibility](projects/msarwar-proposal.md) - Improve readability and accessibility of documentation on the ml5.js website.
