@@ -17,6 +17,24 @@ This is a research course, which is different structures compared to normal cour
 
 The academic requirement for this class is a documention of each step of the research. Every other week, you are expected to add resources, notes, and documentation of your process and outcomes. The final project for the class is a "research report" documenting and summarizing your work over the form of the semester.
 
+## Spring 2024 Projects
+
+- AI Research
+  - Dror - [Context ml5](projects/dror.md) - an AI powered learning platform that teaches creatives to use ml5
+  - Andrew -
+- Audio
+  - Tres - [Generative Audio in ml5.js](projects/tres_proposal.md) - Researching suitable machine learning models for audio generation in the browser
+  - Spencer -
+- Speculative Website Enhancements
+  - Alan Ren - [projects/ml5.js Website Functionality Enhancement and Examples with Built-in Editor](projects/alanren.md) - Enhance the ml5.js website and built-in code editor.
+  - Xiaozao Wang - [Interactive Machine Learning for Beginners](projects/Xiaozao_Wang.md) - Help beginners understand how machine learning works behind the scene through interactive web materials.
+- Documentation and Accessibility
+  - Myrah Sarwar - [Increasing Accessibility](projects/msarwar-proposal.md) - Improve readability and accessibility of documentation on the ml5.js website.
+  - Jack B. Du - [Machine Learning Tutorials for Absolute Beginners](projects/jackbdu-proposal.md) - Creating beginner-friendly educational materials fostering creative explorations with ml5.js.
+- Datasets and Bias
+  - Neeti - [Opinionated](projects/neeti_proposal.md) - Developing a self-assessment tool to mitigate bias in ml5.js.
+  - Anya - [Ethics of the Datasets](projects/anya_proposal.md) - Delving into the datasets supporting a ml5.js model and explore avenues for enhancing the library's documentation.
+
 ## Schedule
 
 ### 1: January 31, 2024
