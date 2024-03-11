@@ -34,11 +34,13 @@ The academic requirement for this class is a documention of each step of the res
 
 ### 4: March 13, 2024
 
-- progress reports
+- transformers.js guest presentation
+- small group meetings and project updates
 
 ### 5: March 27, 2024
 
-- individual meetings
+- progress presentations
+- small group discussions and individual meetings
 
 ### 6: April 10, 2024
 
