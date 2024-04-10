@@ -13,11 +13,57 @@ This is a research course, which is different structures compared to normal cour
 | Contact      | [daniel.shiffman@nyu.edu](mailto:daniel.shiffman@nyu.edu) |
 | Office Hours | (see email for calendar link)                             |
 
-## Documentation
+The academic requirement for this class is a documention of your research. The final project for the class is a "research report" documenting and summarizing your work over the form of the semester.
 
-The academic requirement for this class is a documention of each step of the research. Every other week, you are expected to add resources, notes, and documentation of your process and outcomes. The final project for the class is a "research report" documenting and summarizing your work over the form of the semester.
+## Final Documentation Guidelines
 
-## Spring 2024 Projects
+It is expected that the format and style of the project documentation will vary considerably based on the specifics of each unique project in this class! The main requirement is to link to written documentation (in the form of a blog post, webpage, github markdown file added to this repo, or other online platform). Additionally, you should prepare a concise slide presentation for the final class on April 17th. You'll have about 8 minutes to present, followed by approximately 5 minutes for questions and feedback.
+
+Here is a guide to how you might structure your documentation and presentation.
+
+### Abstract
+
+- Briefly describe your project: What it is, its goals, how you approached it, and the impact you anticipate it will have. Keep it within ~200-250 words.
+
+### Background and Objectives
+
+- Explain the motivation behind your project and its objectives.
+- Detail how your work aligns with and contributes to the ml5.js project or the broader field of creative media arts.
+
+### Process and Methodology
+
+- Outline the methods and approaches you employed.
+- List the tools and technologies you used.
+- Discuss any community engagement or user testing undertaken.
+- Share challenges encountered.
+
+### Final Results
+
+- Describe the outcome of your project. What form does your final work take?
+
+### Future Directions
+
+- Reflect on any new questions or challenges that emerged.
+- Share your key takeaways and where you see this project going in the future.
+
+### References
+
+- List and summarize the key references, literature, or projects that informed your work.
+
+## Project Documentation Links
+
+- Alan -
+- Andrew -
+- Anya -
+- Dror -
+- Jack -
+- Myrah -
+- Neeti -
+- Spencer -
+- Tres -
+- Xiaozao -
+
+## Project Proposals
 
 - AI Research
   - Dror - [Context ml5](projects/dror.md) - an AI powered learning platform that teaches creatives to use ml5
