@@ -52,16 +52,16 @@ Here is a guide to how you might structure your documentation and presentation.
 
 ## Project Documentation Links
 
-- Alan -
-- Andrew -
+- Neeti -
 - Anya -
-- Dror -
+- Xiaozao -
+- Tres -
+- Andrew -
 - Jack -
 - Myrah -
-- Neeti -
 - Spencer -
-- Tres -
-- Xiaozao -
+- Dror -
+- Alan -
 
 ## Project Proposals
 
