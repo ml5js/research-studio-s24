@@ -1,5 +1,5 @@
-// Neural Networks
-let NN;
+// Perceptron
+let perceptron;
 let lr = 0.1;
 
 // data field
@@ -24,7 +24,7 @@ let step_currentState = 0; // 0, 1, 2, 3, 4
 function setup() {
     createCanvas(windowWidth, windowHeight);
     background(255);
-    NN = new NeuralNetwork(2, 2, 1, 200, windowHeight/4, 400, 400);
+    perceptron = new Perceptron(2, 200, windowHeight/4);
     dataField = new DataField(100, windowHeight/2-100, 200, 200);
     AButton = new Button(100, windowHeight/2-120, 40, 20, 'A');
     BButton = new Button(140, windowHeight/2-120, 40, 20, 'B');
@@ -37,7 +37,7 @@ function draw() {
     background(255);
     reactToHover();
 
-    NN.draw();
+    perceptron.draw();
 
     dataField.draw();
     for (let i = 0; i < data_points.length; i ++) {

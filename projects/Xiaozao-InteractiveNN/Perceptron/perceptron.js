@@ -14,14 +14,19 @@ class Perceptron {
       this.x = x;
       this.y = y;
       this.r = 50;
+      this.inputLine_x = [this.x - this.r/2, this.y, this.x - this.r - 30, this.y - 30];
+      this.inputLine_y = [this.x - this.r/2, this.y, this.x - this.r - 30, this.y + 30];
+      this.outputLine = [this.x + this.r/2, this.y, this.x + this.r/2 + 50, this.y];
+      this.weights = [random(-1, 1), random(-1, 1)];
+      this.bias = random(-1, 1);
 
       // state
-      // this.stateMap = {
-      //   0: 'inactive',
-      //   1: 'display_input',
-      //   2: 'display_sum',
-      //   3: 'display_output'
-      // }
+      this.stateMap = {
+        0: 'inactive',
+        1: 'display_input',
+        2: 'display_sum',
+        3: 'display_output'
+      }
       this.state = 0;
 
       this.initializeActivationGraph();
@@ -327,28 +332,6 @@ class Perceptron {
     }
 }
   
-
-class InputNode {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.r = 20;
-    this.value = null;
-  }
-
-  draw() {
-    if (this.value) {
-      fill(0);
-      noStroke();
-      textAlign(CENTER, CENTER);
-      text(this.value, this.x, this.y);
-    }
-  }
-
-}
-
-
-
 
 
 function sigmoid(x) {
