@@ -67,7 +67,7 @@ class DataPoint {
         this.x = map(this.localX, 0, field.w, 0, 1); // actual value
         this.y = map(this.localY, 0, field.h, 0, 1);
         this.inputs = [this.x, this.y];
-        this.label = label;
+        this.label = [label];
     }
 
     drawIn(field) {

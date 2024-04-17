@@ -1,6 +1,6 @@
 // Neural Networks
 let NN;
-let lr = 0.1;
+let lr = 10;
 
 // data field
 let current_class = 'A';
@@ -24,7 +24,7 @@ let step_currentState = 0; // 0, 1, 2, 3, 4
 function setup() {
     createCanvas(windowWidth, windowHeight);
     background(255);
-    NN = new NeuralNetwork(2, 2, 1, 200, windowHeight/4, 400, 400);
+    NN = new NeuralNetwork(2, 2, 1, 200, 0, 400, 400);
     dataField = new DataField(100, windowHeight/2-100, 200, 200);
     AButton = new Button(100, windowHeight/2-120, 40, 20, 'A');
     BButton = new Button(140, windowHeight/2-120, 40, 20, 'B');
@@ -57,7 +57,7 @@ function draw() {
     // tentative error field
     noFill();
     stroke(0);
-    rect(500, 500, 200, 200);
+    rect(500, 500, 300, 200);
     noStroke();
     fill(0);
     textAlign(CENTER, CENTER);
@@ -69,12 +69,12 @@ function draw() {
 
 
 function drawError() {
-    let gap = 200 / errorArr.length;
+    let gap = 300 / errorArr.length;
     beginShape();
     noFill();
     stroke(0);
     strokeWeight(1);
-    for (let i = 0; i < errorArr.length; i++) {
+    for (let i = 0; i < errorArr.length; i+=20) {
         let x = 500 + i * gap;
         let y = 700 - abs(errorArr[i]) * 200;
         vertex(x, y);
@@ -126,10 +126,10 @@ function mousePressed() {
             let idx = Math.floor(Math.random() * data_points.length);
             highlighted = data_points[idx];
             dataField.drawDataInfo(data_points[idx]);
-            perceptron.currentData = data_points[idx];
-            perceptron.state = 0;
+            NN.currentData = data_points[idx];
+            NN.state = 0;
         } else {
-            perceptron.proceed(step_currentState, highlighted);
+            NN.proceed(step_currentState, highlighted);
         }
 
         step_currentState += 1;
@@ -141,7 +141,7 @@ function mousePressed() {
 
     if (tweakButton.isUnder(mouseX, mouseY)) {
         console.log('Tweak');
-        perceptron.train();
+        NN.train();
     }
 
 }
@@ -149,8 +149,8 @@ function mousePressed() {
 function keyPressed() {
     if (keyCode == ENTER) {
         if (data_points.length > 0) {
-            if (errorArr.length < 150) {
-            setInterval(train, 1);
+            if (errorArr.length < 5000) {
+            setInterval(train, 0.01);
             trainCount = 0;
             console.log('Finished training');
             }
@@ -161,10 +161,10 @@ function keyPressed() {
 function train() {
         // console.log('Train one');
         trainCount += 1;
-        if (trainCount < 10) {
+        if (trainCount < 100) {
             let idx = Math.floor(Math.random() * data_points.length);
-            perceptron.currentData = data_points[idx];
-            perceptron.feedforward(data_points[idx]);
+            NN.currentData = data_points[idx];
+            NN.feedforward(data_points[idx]);
         }
     
 

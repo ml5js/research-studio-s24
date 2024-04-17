@@ -7,13 +7,24 @@ class NeuralNetwork {
         this.w = w;
         this.h = h;
 
+        this.ih_lines = [];
+        this.ho_lines = [];
+
+        this.state = 0;
+        // state
+        // this.stateMap = {
+        //   0: 'inactive',
+        //   1: 'input',
+        //   2: 'hidden',
+        //   3: 'output'
+        // }
 
         this.input_n = input_n;
         this.hidden_n = hidden_n;
         this.output_n = output_n;
         this.lr = lr;
 
-        this.current_data = null;
+        this.currentData = null;
 
         this.weights_ih = new Matrix(this.hidden_n, this.input_n);
         this.weights_ho = new Matrix(this.output_n, this.hidden_n);
@@ -68,14 +79,36 @@ class NeuralNetwork {
         }
 
 
+        // store the lines
+        for (let i = 0; i < this.hidden_nodes.length; i++) {
+            let node = this.hidden_nodes[i];
+            for (let j = 0; j < this.input_nodes.length; j++) {
+                let input_node = this.input_nodes[j];
+                let line = [input_node.X+input_node.r/2, input_node.Y, node.X-node.r/2, node.Y]
+                this.ih_lines.push(line);
+            }
+        }
+
+        for (let i = 0; i < this.output_nodes.length; i++) {
+            let node = this.output_nodes[i];
+            for (let j = 0; j < this.hidden_nodes.length; j++) {
+                let hidden_node = this.hidden_nodes[j];
+                let line = [hidden_node.X+hidden_node.r/2, hidden_node.Y, node.X-node.r/2, node.Y]
+                this.ho_lines.push(line);
+            }
+        }
 
     }
 
     feedforward(data_point) {
 
-        this.current_data = data_point;
+        this.currentData = data_point;
+        console.log('currentData--', data_point);
 
         this.inputs = Matrix.fromArray(data_point.inputs);
+        for (let i = 0; i < this.input_nodes.length; i++) {
+            this.input_nodes[i].value = this.inputs.data[i][0];
+        }
 
         this.hidden = Matrix.multiply(this.weights_ih, this.inputs);
         this.hidden.add(this.bias_h);
@@ -84,38 +117,70 @@ class NeuralNetwork {
             this.hidden_nodes[i].output = this.hidden.data[i][0];
         }
     
-        this.output = Matrix.multiply(this.weights_ho, this.hidden);
-        this.output.add(this.bias_o);
-        this.output.map(sigmoid);
+        this.outputs = Matrix.multiply(this.weights_ho, this.hidden);
+        this.outputs.add(this.bias_o);
+        this.outputs.map(sigmoid);
         for (let i = 0; i < this.output_nodes.length; i++) {
-            this.output_nodes[i].output = this.output.data[i][0];
+            this.output_nodes[i].output = this.outputs.data[i][0];
         }
     
-        console.log('output', this.output.toArray());
+        console.log('output', this.outputs.toArray());
 
         this.train();
         
-        // return output.toArray();
     }
 
-    step() {
-
+    proceed(state, highlighted) {
+        this.state = state;
+        // layer by layer, feedforward the data point
+        if (this.state == 1) { 
+            this.inputs = Matrix.fromArray(highlighted.inputs);
+            for (let i = 0; i < this.input_nodes.length; i++) {
+                this.input_nodes[i].value = this.inputs.data[i][0];
+            }
+        
+        } else if (this.state == 2) {
+            // highlighted is not needed, can be replaced by this.currentData
+            this.inputs = Matrix.fromArray(highlighted.inputs);
+            this.hidden = Matrix.multiply(this.weights_ih, this.inputs);
+            this.hidden.add(this.bias_h);
+            this.hidden.map(sigmoid);
+            for (let i = 0; i < this.hidden_nodes.length; i++) {
+                this.hidden_nodes[i].output = this.hidden.data[i][0];
+            }
+        } else if (this.state == 3) {
+            this.outputs = Matrix.multiply(this.weights_ho, this.hidden);
+            this.outputs.add(this.bias_o);
+            this.outputs.map(sigmoid);
+            for (let i = 0; i < this.output_nodes.length; i++) {
+                this.output_nodes[i].output = this.outputs.data[i][0];
+            }
+            console.log('output', this.outputs.toArray());
+        } 
     }
 
 
     train() {
 
         // ---------- Calculate output errors ----------
-        this.targets = Matrix.fromArray(this.current_data.label);
+        
+        this.targets = Matrix.fromArray(this.currentData.label);
+        console.log('targets', this.targets.data);
         this.output_errors = Matrix.subtract(this.targets, this.outputs);
+        errorArr.push(this.output_errors.data[0][0]);
 
         // update Perceptron objects
         for (let i = 0; i < this.output_nodes.length; i++) {
+            console.log('output_errors', this.output_errors.data);
             this.output_nodes[i].error = this.output_errors.data[i][0];
         }
 
 
         // output layer adjustments
+        console.log('-----------debugging');
+        console.log('outputs', this.outputs.data);
+        console.log('output_errors', this.output_errors.data);
+
         let bias_ho_deltas = Matrix.map(this.outputs, dsigmoid);
         bias_ho_deltas.multiply(this.output_errors);
         bias_ho_deltas.multiply(this.lr);
@@ -123,15 +188,23 @@ class NeuralNetwork {
         let hidden_T = Matrix.transpose(this.hidden);
         let weights_ho_deltas = Matrix.multiply(bias_ho_deltas, hidden_T);
 
+        console.log('weights_ho_deltas', weights_ho_deltas.data);
+        console.log('bias_ho_deltas', bias_ho_deltas.data);
+
         this.weights_ho.add(weights_ho_deltas);
         this.bias_o.add(bias_ho_deltas);
+
+        console.log('weights_ho', this.weights_ho.data);
+        console.log('bias_o', this.bias_o.data);
 
         // update Perceptron objects
         for (let i = 0; i < this.output_nodes.length; i++) {
             this.output_nodes[i].bias_deltas = bias_ho_deltas.data[i][0];
             this.output_nodes[i].weights_deltas = weights_ho_deltas.data[i];
             this.output_nodes[i].weights = this.weights_ho.data[i];
-            this.output_nodes[i].bias = this.bias_o.data[i];
+            this.output_nodes[i].bias = this.bias_o.data[i][0];
+            console.log('weights update', this.output_nodes[i].weights);
+            console.log('bias update', this.output_nodes[i].bias);
         }
 
 
@@ -156,29 +229,191 @@ class NeuralNetwork {
             this.hidden_nodes[i].bias_deltas = bias_ih_deltas.data[i][0];
             this.hidden_nodes[i].weights_deltas = weights_ih_deltas.data[i];
             this.hidden_nodes[i].weights = this.weights_ih.data[i];
-            this.hidden_nodes[i].bias = this.bias_h.data[i];
+            this.hidden_nodes[i].bias = this.bias_h.data[i][0];
         }
     }
 
     draw() {
-        // input layer
+
+        // highlight the current state
+        if (this.state == 1) {
+            // highlight input layer nodes
+            for (let i = 0; i < this.input_nodes.length; i++) {
+                noStroke();
+                fill(255, 255, 0);
+                ellipse(this.input_nodes[i].X, this.input_nodes[i].Y, this.input_nodes[i].r + 10);
+            }
+        } else if (this.state == 2) {
+            // highlight hidden layer nodes
+            for (let i = 0; i < this.hidden_nodes.length; i++) {
+                noStroke();
+                fill(255, 255, 0);
+                ellipse(this.hidden_nodes[i].X, this.hidden_nodes[i].Y, this.hidden_nodes[i].r + 10);
+            }
+        } else if (this.state == 3) {
+            // highlight output layer nodes
+            for (let i = 0; i < this.output_nodes.length; i++) {
+                noStroke();
+                fill(255, 255, 0);
+                ellipse(this.output_nodes[i].X, this.output_nodes[i].Y, this.output_nodes[i].r + 10);
+            }
+        }
+
+        // draw nodes
+        stroke(0);
+        strokeWeight(2);
+        fill(255);
         for (let i = 0; i < this.input_nodes.length; i++) {
-            this.input_nodes[i].draw();
+            ellipse(this.input_nodes[i].X, this.input_nodes[i].Y, this.input_nodes[i].r);
         }
 
-        // hidden layer
         for (let i = 0; i < this.hidden_nodes.length; i++) {
-            this.hidden_nodes[i].draw();
+            ellipse(this.hidden_nodes[i].X, this.hidden_nodes[i].Y, this.hidden_nodes[i].r);
         }
 
-        // output layer
         for (let i = 0; i < this.output_nodes.length; i++) {
-            this.output_nodes[i].draw();
+            ellipse(this.output_nodes[i].X, this.output_nodes[i].Y, this.output_nodes[i].r);
         }
 
-        // draw connections
+        // draw connection lines
+        for (let i = 0; i < this.ih_lines.length; i++) {
+            line(this.ih_lines[i][0], this.ih_lines[i][1], this.ih_lines[i][2], this.ih_lines[i][3]);
+        }
+
+        for (let i = 0; i < this.ho_lines.length; i++) {
+            line(this.ho_lines[i][0], this.ho_lines[i][1], this.ho_lines[i][2], this.ho_lines[i][3]);
+        }
+
+        // draw output line
+        line(this.output_nodes[0].X + this.output_nodes[0].r/2, this.output_nodes[0].Y, this.output_nodes[0].X + this.output_nodes[0].r + 50, this.output_nodes[0].Y);
+
+        // draw activation signs
+        // rightward triangles attached on the right of the nodes
+        for (let i = 0; i < this.hidden_nodes.length; i++) {
+            let node = this.hidden_nodes[i];
+            let x = node.X + node.r/2;
+            let y = node.Y;
+            triangle(x+3, y - 7, x+3, y + 7, x + 13, y);
+        }
+
+        for (let i = 0; i < this.output_nodes.length; i++) {
+            let node = this.output_nodes[i];
+            let x = node.X + node.r/2;
+            let y = node.Y;
+            triangle(x+3, y - 7, x+3, y + 7, x + 13, y);
+        }
+
+        // draw error axis
+        this.outputAxis = [this.output_nodes[0].X + 120, this.output_nodes[0].Y -30, this.output_nodes[0].X + 120, this.output_nodes[0].Y + 30];
+        // console.log('axis', this.outputAxis);
+        stroke(0);
+        strokeWeight(2);
+        line(this.outputAxis[0], this.outputAxis[1], this.outputAxis[2], this.outputAxis[3]);
+        line(this.outputAxis[0] - 4, this.outputAxis[1], this.outputAxis[0] + 4, this.outputAxis[1]);
+        line(this.outputAxis[0] - 4, this.outputAxis[3], this.outputAxis[0] + 4, this.outputAxis[3]);
+        textAlign(CENTER, CENTER);
+        fill(0);
+        noStroke();
+        text("1", this.outputAxis[0] - 10, this.outputAxis[1]);
+        text("0", this.outputAxis[0] - 10, this.outputAxis[3]);
+        // Draw target point
+        if (this.currentData) {
+            let targetX = this.x + this.r + 50; 
+            let targetY = this.currentData.label == 1 ? this.y - 30 : this.y + 30;
+            let color = this.currentData.label == 1 ? [255, 0, 0] : [0, 0, 255];
+            fill(color);
+            noStroke();
+            ellipse(targetX, targetY, 8, 8);
+        }
+
+        // draw error axis of hidden layer
+        for (let i = 0; i < this.hidden_nodes.length; i++) {
+            let axisLength = 50;
+            this.hiddenAxis = [this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y -axisLength/2, this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y + axisLength/2];
+            stroke(0);
+            strokeWeight(2);
+            line(this.hiddenAxis[0], this.hiddenAxis[1], this.hiddenAxis[2], this.hiddenAxis[3]);
+            line(this.hiddenAxis[0] - 4, this.hiddenAxis[1] +axisLength/2, this.hiddenAxis[0] + 4, this.hiddenAxis[1]+axisLength/2);
+        }
+
+
+
+        // draw text
+        noStroke();
+        fill(0);
+        textAlign(CENTER, CENTER);
+        textSize(14);
+        text('Input layer', this.x, this.input_nodes[0].Y - 80);
+        text('Hidden layer', this.x + this.w / 2, this.input_nodes[0].Y - 80);
+        text('Output layer', this.x + this.w, this.input_nodes[0].Y - 80);
+
+        // draw weights
+        for (let i = 0; i < this.ih_lines.length; i++) {
+            let line_fourth = [this.ih_lines[i][0] * 1/5 + this.ih_lines[i][2] * 4/5, this.ih_lines[i][1] * 1/5 + this.ih_lines[i][3] *4/5];
+            fill(0);
+            noStroke();
+            textAlign(CENTER, CENTER);
+            // very unorganized!!!!! need to be fixed
+            if (i < 2) {
+                text(this.hidden_nodes[0].weights[i].toFixed(2), line_fourth[0], line_fourth[1]-8);
+            } else {
+                text(this.hidden_nodes[1].weights[i-2].toFixed(2), line_fourth[0], line_fourth[1]-8);
+            }   
+        }
+
+        for (let i = 0; i < this.ho_lines.length; i++) {
+            let line_fourth = [this.ho_lines[i][0] * 1/5 + this.ho_lines[i][2] * 4/5, this.ho_lines[i][1] * 1/5 + this.ho_lines[i][3] *4/5];
+            fill(0);
+            noStroke();
+            textAlign(CENTER, CENTER);
+            text(this.output_nodes[0].weights[i].toFixed(2), line_fourth[0], line_fourth[1]-8);
+        }
+
+        // draw bias
+        for (let i = 0; i < this.hidden_nodes.length; i++) {
+            fill(0);
+            noStroke();
+            textAlign(CENTER, CENTER);
+            text(this.hidden_nodes[i].bias.toFixed(2), this.hidden_nodes[i].X, this.hidden_nodes[i].Y + 40);
+        }
+
+        for (let i = 0; i < this.output_nodes.length; i++) {
+            fill(0);
+            noStroke();
+            textAlign(CENTER, CENTER);
+            text(this.output_nodes[i].bias.toFixed(2), this.output_nodes[i].X, this.output_nodes[i].Y + 40);
+        }
+        
+        // draw input values inside the node ellipse
+        for (let i = 0; i < this.input_nodes.length; i++) {
+            if (this.input_nodes[i].value) {
+                fill(0);
+                noStroke();
+                textAlign(CENTER, CENTER);
+                text(this.input_nodes[i].value.toFixed(2), this.input_nodes[i].X, this.input_nodes[i].Y);
+            }
+        }
+        // draw output inside the node ellipse if it exists
+        for (let i = 0; i < this.output_nodes.length; i++) {
+            if (this.output_nodes[i].output) {
+                fill(0);
+                noStroke();
+                textAlign(CENTER, CENTER);
+                text(this.output_nodes[i].output.toFixed(2), this.output_nodes[i].X, this.output_nodes[i].Y);
+            }
+        }
+        // hidden
+        for (let i = 0; i < this.hidden_nodes.length; i++) {
+            if (this.hidden_nodes[i].output) {
+                fill(0);
+                noStroke();
+                textAlign(CENTER, CENTER);
+                text(this.hidden_nodes[i].output.toFixed(2), this.hidden_nodes[i].X, this.hidden_nodes[i].Y);
+            }
+        }
 
     }
+    
 }
 
 function sigmoid(x) {

@@ -1,5 +1,5 @@
 class Perceptron {
-    constructor(input_n, x, y) {
+    constructor(input_n, X, Y) {
       this.input_n = input_n;
       this.inputs = [];
       this.weight_n = this.input_n;
@@ -11,9 +11,14 @@ class Perceptron {
       this.currentDisplay = null;
 
       // visualization
-      this.x = x;
-      this.y = y;
+      this.X = X; // position in the neural network
+      this.Y = Y;
+      this.x = windowWidth/2;
+      this.y = windowHeight*3/4;
       this.r = 50;
+      this.inputLine_x = [this.x - this.r/2, this.y, this.x - this.r - 30, this.y - 30];
+      this.inputLine_y = [this.x - this.r/2, this.y, this.x - this.r - 30, this.y + 30];
+      this.outputLine = [this.x + this.r/2, this.y, this.x + this.r/2 + 50, this.y];
 
       // state
       // this.stateMap = {
@@ -83,6 +88,7 @@ class Perceptron {
 
     // accelerated version
     feedforward(data_point) {
+
       this.inputs = this.currentData.inputs;
       // console.log('inputs', this.inputs);
       this.sum = 0;
@@ -329,10 +335,10 @@ class Perceptron {
   
 
 class InputNode {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.r = 20;
+  constructor(X, Y) {
+    this.X = X;
+    this.Y = Y;
+    this.r = 50;
     this.value = null;
   }
 
