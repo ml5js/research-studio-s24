@@ -54,7 +54,7 @@ Here is a guide to how you might structure your documentation and presentation.
 
 - Neeti -
 - Anya -
-- Xiaozao -
+- Xiaozao - https://docs.google.com/document/d/1sZ_J3FM2iE9ZaFA6JRdLb_5t2hirzwK_BQgbHktw9MQ/edit?usp=sharing
 - Tres -
 - Andrew -
 - Jack -
