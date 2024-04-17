@@ -1,4 +1,4 @@
-// Perceptron
+// Neural Networks
 let perceptron;
 let lr = 0.1;
 
@@ -24,12 +24,12 @@ let step_currentState = 0; // 0, 1, 2, 3, 4
 function setup() {
     createCanvas(windowWidth, windowHeight);
     background(255);
-    perceptron = new Perceptron(2, 200, windowHeight/4);
+    perceptron = new Perceptron(2, 500, windowHeight/2);
     dataField = new DataField(100, windowHeight/2-100, 200, 200);
     AButton = new Button(100, windowHeight/2-120, 40, 20, 'A');
     BButton = new Button(140, windowHeight/2-120, 40, 20, 'B');
-    stepButton = new Button(0, 0, 40, 20, 'Step');
-    tweakButton = new Button(40, 0, 40, 20, 'Tweak');
+    stepButton = new Button(440, 250, 50, 25, 'Step');
+    tweakButton = new Button(500, 250, 50, 25, 'Tweak');
     
 }
 
@@ -57,11 +57,11 @@ function draw() {
     // tentative error field
     noFill();
     stroke(0);
-    rect(500, 500, 200, 200);
+    rect(700, windowHeight/2-100, 200, 200);
     noStroke();
     fill(0);
-    textAlign(CENTER, CENTER);
-    text(`lr: ${lr}`, 600, 720);
+    textAlign(LEFT, CENTER);
+    text(`lr: ${lr}`, 700, windowHeight/2+120);
     drawError();
 
 
@@ -75,8 +75,8 @@ function drawError() {
     stroke(0);
     strokeWeight(1);
     for (let i = 0; i < errorArr.length; i++) {
-        let x = 500 + i * gap;
-        let y = 700 - abs(errorArr[i]) * 200;
+        let x = 700 + i * gap;
+        let y = (windowHeight/2+100) - abs(errorArr[i]) * 200;
         vertex(x, y);
     }
     endShape();

@@ -11,6 +11,7 @@ class NeuralNetwork {
         this.ho_lines = [];
 
         this.state = 0;
+        this.tweaking = false;
         // state
         // this.stateMap = {
         //   0: 'inactive',
@@ -123,6 +124,11 @@ class NeuralNetwork {
         for (let i = 0; i < this.output_nodes.length; i++) {
             this.output_nodes[i].output = this.outputs.data[i][0];
         }
+
+        this.targets = Matrix.fromArray(this.currentData.label);
+        console.log('targets', this.targets.data);
+        this.output_errors = Matrix.subtract(this.targets, this.outputs);
+        errorArr.push(this.output_errors.data[0][0]);
     
         console.log('output', this.outputs.toArray());
 
@@ -155,6 +161,10 @@ class NeuralNetwork {
             for (let i = 0; i < this.output_nodes.length; i++) {
                 this.output_nodes[i].output = this.outputs.data[i][0];
             }
+            this.targets = Matrix.fromArray(this.currentData.label);
+            console.log('targets', this.targets.data);
+            this.output_errors = Matrix.subtract(this.targets, this.outputs);
+            errorArr.push(this.output_errors.data[0][0]);
             console.log('output', this.outputs.toArray());
         } 
     }
@@ -167,7 +177,7 @@ class NeuralNetwork {
         this.targets = Matrix.fromArray(this.currentData.label);
         console.log('targets', this.targets.data);
         this.output_errors = Matrix.subtract(this.targets, this.outputs);
-        errorArr.push(this.output_errors.data[0][0]);
+        // errorArr.push(this.output_errors.data[0][0]);
 
         // update Perceptron objects
         for (let i = 0; i < this.output_nodes.length; i++) {
@@ -177,10 +187,6 @@ class NeuralNetwork {
 
 
         // output layer adjustments
-        console.log('-----------debugging');
-        console.log('outputs', this.outputs.data);
-        console.log('output_errors', this.output_errors.data);
-
         let bias_ho_deltas = Matrix.map(this.outputs, dsigmoid);
         bias_ho_deltas.multiply(this.output_errors);
         bias_ho_deltas.multiply(this.lr);
@@ -188,14 +194,8 @@ class NeuralNetwork {
         let hidden_T = Matrix.transpose(this.hidden);
         let weights_ho_deltas = Matrix.multiply(bias_ho_deltas, hidden_T);
 
-        console.log('weights_ho_deltas', weights_ho_deltas.data);
-        console.log('bias_ho_deltas', bias_ho_deltas.data);
-
         this.weights_ho.add(weights_ho_deltas);
         this.bias_o.add(bias_ho_deltas);
-
-        console.log('weights_ho', this.weights_ho.data);
-        console.log('bias_o', this.bias_o.data);
 
         // update Perceptron objects
         for (let i = 0; i < this.output_nodes.length; i++) {
@@ -203,8 +203,6 @@ class NeuralNetwork {
             this.output_nodes[i].weights_deltas = weights_ho_deltas.data[i];
             this.output_nodes[i].weights = this.weights_ho.data[i];
             this.output_nodes[i].bias = this.bias_o.data[i][0];
-            console.log('weights update', this.output_nodes[i].weights);
-            console.log('bias update', this.output_nodes[i].bias);
         }
 
 
@@ -328,12 +326,12 @@ class NeuralNetwork {
 
         // draw error axis of hidden layer
         for (let i = 0; i < this.hidden_nodes.length; i++) {
-            let axisLength = 50;
-            this.hiddenAxis = [this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y -axisLength/2, this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y + axisLength/2];
+            this.axisLength = 50;
+            this.hiddenAxis = [this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y -this.axisLength/2, this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y + this.axisLength/2];
             stroke(0);
             strokeWeight(2);
             line(this.hiddenAxis[0], this.hiddenAxis[1], this.hiddenAxis[2], this.hiddenAxis[3]);
-            line(this.hiddenAxis[0] - 4, this.hiddenAxis[1] +axisLength/2, this.hiddenAxis[0] + 4, this.hiddenAxis[1]+axisLength/2);
+            line(this.hiddenAxis[0] - 4, this.hiddenAxis[1] +this.axisLength/2, this.hiddenAxis[0] + 4, this.hiddenAxis[1]+this.axisLength/2);
         }
 
 
@@ -411,6 +409,75 @@ class NeuralNetwork {
                 text(this.hidden_nodes[i].output.toFixed(2), this.hidden_nodes[i].X, this.hidden_nodes[i].Y);
             }
         }
+
+        // draw target on the output error axis if currentData is defined
+        if (this.currentData) {
+            // let targetY = this.outputAxis[1] + (1 - this.currentData.label) * 30;
+            let targetY = this.currentData.label == 1 ? this.output_nodes[0].Y - 30 : this.output_nodes[0].Y + 30;
+            let color = this.currentData.label == 1 ? [255, 0, 0] : [0, 0, 255];
+            fill(color);
+            noStroke();
+            ellipse(this.outputAxis[0], targetY, 8, 8);
+        }
+        if (this.state == 3) {
+            // draw output on the error axis
+            if (this.output_errors) {
+                let outputX = this.outputAxis[0];
+                // let outputMax = 1*this.weights[0] + 1*this.weights[1] + this.bias;
+                // let outputMin = 0*this.weights[0] + 0*this.weights[1] + this.bias;
+                let outputY = map(this.outputs.data[0], 0, 1, this.outputAxis[3], this.outputAxis[1]);
+                let color = this.currentData.label == 1 ? [255, 0, 0] : [0, 0, 255];
+                noFill();
+                stroke(color);
+                ellipse(outputX, outputY, 8, 8);
+
+                // draw compare arrow
+                
+                if (this.output_errors.data[0][0] > 0) {
+                    // upward arrow
+                    let targetX = this.outputAxis[0];
+                    let targetY = this.currentData.label == 1 ? this.output_nodes[0].Y - 30 : this.output_nodes[0].Y + 30;
+                    line(outputX+10, outputY, targetX+10, targetY);
+                    line(targetX+10, targetY, targetX - 5 +10, targetY + 5);
+                    line(targetX+10, targetY, targetX + 5+10, targetY + 5);
+
+                } else {
+                    // downward arrow
+                    let targetX = this.outputAxis[0];
+                    let targetY = this.currentData.label == 1 ? this.output_nodes[0].Y - 30 : this.output_nodes[0].Y + 30;
+                    line(outputX+10, outputY, targetX+10, targetY);
+                    line(targetX+10, targetY, targetX - 5 +10, targetY - 5);
+                    line(targetX+10, targetY, targetX + 5+10, targetY - 5);
+                }
+            }
+        }
+
+        // draw error of hidden layer
+        if (this.tweaking && this.hidden_errors) {
+            // very very unorganized x 2 ....!!! MUST BE FIXED
+            for (let i = 0; i < this.hidden_nodes.length; i++) {
+
+                this.hiddenAxis = [this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y - 25, this.hidden_nodes[i].X + 70, this.hidden_nodes[i].Y + 25];
+                console.log('hiddenErrors', this.hidden_errors.data);
+                let errorY = map(this.hidden_errors.data[i][0], -1, 1, this.hiddenAxis[3]+this.axisLength, this.hiddenAxis[1]-this.axisLength);
+                let color = this.hidden_errors.data[i][0] > 0 ? [255, 0, 0] : [0, 0, 255];
+                stroke(color);
+                // arrows pointing from output to target
+                if (this.hidden_errors.data[i][0] > 0) {
+                    // upward arrow
+                    line(this.hiddenAxis[0], this.hiddenAxis[1] + this.axisLength/2, this.hiddenAxis[0], errorY);
+                    line(this.hiddenAxis[0], errorY, this.hiddenAxis[0] - 5, errorY + 5);
+                    line(this.hiddenAxis[0], errorY, this.hiddenAxis[0] + 5, errorY + 5);
+                } else {
+                    // downward arrow
+                    line(this.hiddenAxis[0], this.hiddenAxis[1] + this.axisLength/2, this.hiddenAxis[0], errorY);
+                    line(this.hiddenAxis[0], errorY, this.hiddenAxis[0] - 5, errorY - 5);
+                    line(this.hiddenAxis[0], errorY, this.hiddenAxis[0] + 5, errorY - 5);
+                }
+
+            }
+        }
+        
 
     }
     

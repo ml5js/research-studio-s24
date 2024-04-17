@@ -53,11 +53,44 @@ class DataField {
         this.pointBeingActivated = dataPoint;        
     }
 
+}
 
 
+class ErrorField {
+    constructor(x,y,w,h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
 
-    
-  }
+    draw() {
+        // border
+        noFill();
+        stroke(0);
+        rect(this.x, this.y, this.w, this.h);
+        // lr text
+        noStroke();
+        fill(0);
+        textAlign(LEFT, CENTER);
+        text(`lr: ${lr}`, windowWidth*3/4, windowHeight/2+120); 
+        
+
+        // draw error
+        
+        let gap = this.w / errorArr.length;
+        beginShape();
+        noFill();
+        stroke(0);
+        strokeWeight(1);
+        for (let i = 0; i < errorArr.length; i++) {
+            let x = this.x + i * gap;
+            let y = this.y + this.h - abs(errorArr[i]) * 200;
+            vertex(x, y);
+        }
+        endShape();
+    }
+}
 
 
 class DataPoint {
@@ -101,6 +134,7 @@ class Button {
 
     drawButton() {
         stroke(0);
+        strokeWeight(2);
         let color = this.highlighted ? [255,255,0] : [255,255,255];
         fill(color);
         rect(this.x, this.y, this.w, this.h);

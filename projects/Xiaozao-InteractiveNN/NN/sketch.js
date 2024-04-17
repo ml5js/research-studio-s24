@@ -8,6 +8,7 @@ let dataField;
 let data_points = [];
 
 // error field
+let errorField;
 let errorArr = [];
 let trainCount = 0;
 
@@ -24,12 +25,13 @@ let step_currentState = 0; // 0, 1, 2, 3, 4
 function setup() {
     createCanvas(windowWidth, windowHeight);
     background(255);
-    NN = new NeuralNetwork(2, 2, 1, 200, 0, 400, 400);
+    NN = new NeuralNetwork(2, 2, 1, windowWidth/3-70, windowHeight/2-250, windowWidth/3, 400);
     dataField = new DataField(100, windowHeight/2-100, 200, 200);
+    errorField = new ErrorField(windowWidth*3/4, windowHeight/2-100, 300, 200);
     AButton = new Button(100, windowHeight/2-120, 40, 20, 'A');
     BButton = new Button(140, windowHeight/2-120, 40, 20, 'B');
-    stepButton = new Button(0, 0, 40, 20, 'Step');
-    tweakButton = new Button(40, 0, 40, 20, 'Tweak');
+    stepButton = new Button(windowWidth/2-140, 100, 50, 25, 'Step');
+    tweakButton = new Button(windowWidth/2-60, 100, 50, 25, 'Tweak');
     
 }
 
@@ -47,6 +49,8 @@ function draw() {
         highlighted.highlightIn(dataField);
     }
 
+    errorField.draw();
+
     // TODO: selected node
 
     AButton.drawButton();
@@ -54,33 +58,9 @@ function draw() {
     stepButton.drawButton();
     tweakButton.drawButton();
 
-    // tentative error field
-    noFill();
-    stroke(0);
-    rect(500, 500, 300, 200);
-    noStroke();
-    fill(0);
-    textAlign(CENTER, CENTER);
-    text(`lr: ${lr}`, 600, 720);
-    drawError();
-
 
 }
 
-
-function drawError() {
-    let gap = 300 / errorArr.length;
-    beginShape();
-    noFill();
-    stroke(0);
-    strokeWeight(1);
-    for (let i = 0; i < errorArr.length; i+=20) {
-        let x = 500 + i * gap;
-        let y = 700 - abs(errorArr[i]) * 200;
-        vertex(x, y);
-    }
-    endShape();
-}
 
 
 function reactToHover() {
@@ -94,6 +74,20 @@ function reactToHover() {
         BButton.highlighted = true;
     } else {
         BButton.highlighted = false;
+    }
+
+    // step 
+    if (stepButton.isUnder(mouseX, mouseY)) {
+        stepButton.highlighted = true;
+    } else {
+        stepButton.highlighted = false;
+    }
+
+    // tweak    
+    if (tweakButton.isUnder(mouseX, mouseY)) {
+        tweakButton.highlighted = true;
+    } else {
+        tweakButton.highlighted = false;
     }
 }
 
@@ -121,6 +115,7 @@ function mousePressed() {
     }
 
     if (stepButton.isUnder(mouseX, mouseY)) {
+        NN.tweaking = false;
         console.log(`Current state: ${step_currentState}`);
         if (step_currentState == 0) {
             let idx = Math.floor(Math.random() * data_points.length);
@@ -141,6 +136,7 @@ function mousePressed() {
 
     if (tweakButton.isUnder(mouseX, mouseY)) {
         console.log('Tweak');
+        NN.tweaking = true;
         NN.train();
     }
 
@@ -148,11 +144,14 @@ function mousePressed() {
 
 function keyPressed() {
     if (keyCode == ENTER) {
+        NN.tweaking = true;
+        NN.state = 3;
         if (data_points.length > 0) {
-            if (errorArr.length < 5000) {
-            setInterval(train, 0.01);
-            trainCount = 0;
-            console.log('Finished training');
+            
+            if (errorArr.length < 2000) {
+                setInterval(train, 20);
+                trainCount = 0;
+                console.log('Finished training');
             }
     }
 }
@@ -161,7 +160,7 @@ function keyPressed() {
 function train() {
         // console.log('Train one');
         trainCount += 1;
-        if (trainCount < 100) {
+        if (trainCount < 20) {
             let idx = Math.floor(Math.random() * data_points.length);
             NN.currentData = data_points[idx];
             NN.feedforward(data_points[idx]);
