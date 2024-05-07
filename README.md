@@ -61,7 +61,7 @@ Here is a guide to how you might structure your documentation and presentation.
 - Myrah -
 - Spencer -
 - Dror -
-- Alan -
+- Alan - [Enhance the ml5.js website with built-in code editor](./documentations/alanren.md)
 
 ## Project Proposals
 
