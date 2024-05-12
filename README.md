@@ -58,7 +58,7 @@ Here is a guide to how you might structure your documentation and presentation.
 - Tres -
 - Andrew -
 - Jack -
-- Myrah -
+- Myrah - [Slide deck](https://docs.google.com/presentation/d/1wFa3XK-Wg8_feKY5SuuC3M_G0Wl5dl9uXG5vQAQceIU/edit?usp=sharing)
 - Spencer -
 - Dror -
 - Alan - [Enhance the ml5.js website with built-in code editor](./documentations/alanren.md)
